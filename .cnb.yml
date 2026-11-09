@@ -1,0 +1,27 @@
+# CNB 云原生开发配置 —— 影策（open-ai-canvas）
+#
+# 作用：在 CNB 云端环境里用 Docker Compose 起影策全栈，
+#      前端监听 8686（CNB 预览端口），浏览器点「云原生开发」即得到公网地址。
+#
+# 数据持久化：所有数据目录 bind 到 /workspace/.yingce-data，
+#            配合 backup: true，环境重启后数据还在。
+
+main:
+  vscode:
+    - docker:
+        image: cnbcool/default-dev-env:latest
+      runner:
+        cpus: 8
+      services:
+        - docker
+        - vscode
+      options:
+        # 仅预览模式：跳过 WebIDE，直接打开服务页面
+        onlyPreview: true
+        launch: bash .cnb/start-yingce.sh
+        # launch 后台托管，服务长期运行
+        daemon: true
+        # 无访问心跳后关闭环境的等待时间（示例中有 10m / 1h 两种写法）
+        keepAliveTimeout: 24h
+        # 工作区备份：/workspace 下的数据在环境重建后保留
+        backup: true
